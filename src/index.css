@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  /* ==== DISPLAY / CARTOON FONTS (choisis-en un pour --font-cartoon) ==== */
+  --font-lilita: 'Lilita One', sans-serif;
+  --font-bungee: 'Bungee', sans-serif;
+  --font-chewy: 'Chewy', sans-serif;
+  --font-passion: 'Passion One', sans-serif;
+
+  /* ==== BODY FONT ==== */
+  --font-manrope: 'Manrope', sans-serif;
+
+  /* ==== une fois choisi, active ces deux lignes avec ton pick ==== */
+  --font-cartoon: var(--font-lilita);
+  --font-body: var(--font-manrope);
+
+
+
+  --color-bg: #F4F1EC;
+  --color-ink: #191623;
+  --color-accent: #5B4CFF;
+  --color-coral: #FF5A4E;
+}
