@@ -306,7 +306,7 @@ function SetupScreen({ onStart }) {
         </div>
 
         {/* toggle */}
-        <div className="mb-4 flex items-center justify-between rounded-2xl border border-[#F5F0E6]/10 bg-[#141414] px-4 py-3.5">
+        <div className="mb-2 flex items-center justify-between rounded-2xl border border-[#F5F0E6]/10 bg-[#141414] px-4 py-2.5">
           <span className="flex items-center gap-2 text-xs font-bold tracking-tight text-[#F5F0E6]/75">
             {imposterSeesTheme ? <Eye size={15} className="text-[#C81E1E]" /> : <EyeOff size={15} className="text-[#F5F0E6]/40" />}
             L'imposteur voit le thème
@@ -315,7 +315,7 @@ function SetupScreen({ onStart }) {
         </div>
 
         {/* imposters */}
-        <div className="mb-2 flex items-center justify-between rounded-2xl border border-[#C81E1E]/25 bg-[#C81E1E]/10 px-5 py-4">
+        <div className="mb-2 flex items-center justify-between rounded-2xl border border-[#C81E1E]/25 bg-[#C81E1E]/10 px-5 py-3">
           <span className="flex items-center gap-2 text-sm font-bold tracking-tight">
             <VenetianMask size={17} className="text-[#C81E1E]" />
             Imposteurs
