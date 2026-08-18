@@ -229,8 +229,9 @@ function SetupScreen({ onStart }) {
         Prépare ta partie
       </motion.h2>
 
-      {/* ---- zone scrollable : tout le contenu variable vit ici ---- */}
-      <div className="relative z-10 min-h-0 flex-1 overflow-y-auto pr-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* ---- zone scrollable : tout le contenu variable et le bouton vivent ici ---- */}
+      <div className="relative z-10 min-h-0 flex-1 overflow-y-auto pr-1 pb-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        
         {/* players */}
         <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-tight text-[#F5F0E6]/40">
           <Users size={13} /> Joueurs · {players.length}
@@ -315,7 +316,7 @@ function SetupScreen({ onStart }) {
         </div>
 
         {/* imposters */}
-        <div className="mb-2 flex items-center justify-between rounded-2xl border border-[#C81E1E]/25 bg-[#C81E1E]/10 px-5 py-3">
+        <div className="mb-6 flex items-center justify-between rounded-2xl border border-[#C81E1E]/25 bg-[#C81E1E]/10 px-5 py-3">
           <span className="flex items-center gap-2 text-sm font-bold tracking-tight">
             <VenetianMask size={17} className="text-[#C81E1E]" />
             Imposteurs
@@ -345,38 +346,39 @@ function SetupScreen({ onStart }) {
             </motion.button>
           </div>
         </div>
-      </div>
 
-      {/* ---- CTA : toujours visible, ancré en bas, jamais poussé hors écran ---- */}
-      <div className="relative z-10 shrink-0 pb-5 pt-3">
-        <motion.button
-          disabled={!canStart}
-          onClick={() =>
-            canStart && onStart({ players, themeId, imposters, imposterSeesTheme })
-          }
-          whileTap={canStart ? { scale: 0.97 } : {}}
-          whileHover={canStart ? { y: -2 } : {}}
-          className={`relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full py-4 text-lg font-bold tracking-tight transition-colors ${
-            canStart
-              ? "bg-[#C81E1E] text-[#F5F0E6] shadow-[0_10px_24px_-8px_rgba(200,30,30,0.5)]"
-              : "cursor-not-allowed bg-[#F5F0E6]/10 text-[#F5F0E6]/30"
-          }`}
-        >
-          {canStart && (
-            <motion.span
-              className="absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20"
-              animate={{ left: ["-33%", "133%"] }}
-              transition={{ duration: 2.3, repeat: Infinity, repeatDelay: 1.3, ease: "easeInOut" }}
-            />
+        {/* ---- CTA : Intégré dans le flux directement sous les imposteurs ---- */}
+        <div className="relative mt-2">
+          <motion.button
+            disabled={!canStart}
+            onClick={() =>
+              canStart && onStart({ players, themeId, imposters, imposterSeesTheme })
+            }
+            whileTap={canStart ? { scale: 0.97 } : {}}
+            whileHover={canStart ? { y: -2 } : {}}
+            className={`relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full py-4 text-lg font-bold tracking-tight transition-colors ${
+              canStart
+                ? "bg-[#C81E1E] text-[#F5F0E6] shadow-[0_10px_24px_-8px_rgba(200,30,30,0.5)]"
+                : "cursor-not-allowed bg-[#F5F0E6]/10 text-[#F5F0E6]/30"
+            }`}
+          >
+            {canStart && (
+              <motion.span
+                className="absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20"
+                animate={{ left: ["-33%", "133%"] }}
+                transition={{ duration: 2.3, repeat: Infinity, repeatDelay: 1.3, ease: "easeInOut" }}
+              />
+            )}
+            C'est parti
+            <ArrowRight size={18} />
+          </motion.button>
+          {!canStart && (
+            <p className="mt-3 text-center text-xs font-bold tracking-tight text-[#F5F0E6]/30">
+              Il faut au moins 3 joueurs
+            </p>
           )}
-          C'est parti
-          <ArrowRight size={18} />
-        </motion.button>
-        {!canStart && (
-          <p className="mt-2 text-center text-xs font-bold tracking-tight text-[#F5F0E6]/30">
-            Il faut au moins 3 joueurs
-          </p>
-        )}
+        </div>
+
       </div>
     </motion.div>
   );
