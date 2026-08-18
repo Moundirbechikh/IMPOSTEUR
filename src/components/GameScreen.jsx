@@ -27,7 +27,7 @@ const WORDS = {
 /* ============================================================
    ÉCRAN 3 — LE JEU (DISTRIBUTION DES CARTES 3D)
 ============================================================ */
-export default function GameScreen({ config, onRestart }) {
+export default function GameScreen({ config, onRestart, onGoToVote }) {
   const { players, themeId, imposters, imposterSeesTheme } = config;
 
   const gameData = useMemo(() => {
@@ -150,7 +150,7 @@ export default function GameScreen({ config, onRestart }) {
 
                   {/* Indication d'action en bas */}
                   <div className="mb-2 opacity-60 flex flex-col items-center">
-                    <span className="mb-3 h-1 w-8 rounded-full bg-[#C81E1E]/40"></span> {/* Petit rappel rouge */}
+                    <span className="mb-3 h-1 w-8 rounded-full bg-[#C81E1E]/40"></span>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#F5F0E6]">
                       Toucher pour ouvrir
                     </p>
@@ -168,7 +168,7 @@ export default function GameScreen({ config, onRestart }) {
                 >
                   {/* BADGE THEME AVEC BORDURE ET POINT ROUGE */}
                   <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-black/60 px-4 py-1.5 border border-[#C81E1E]/30 shadow-[0_0_15px_rgba(200,30,30,0.1)]">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#C81E1E] animate-pulse" /> {/* Touche rouge */}
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#C81E1E] animate-pulse" />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">
                       Thème
                     </span>
@@ -261,7 +261,7 @@ export default function GameScreen({ config, onRestart }) {
             <motion.button
               whileTap={{ scale: 0.94 }}
               whileHover={{ scale: 1.02 }}
-              onClick={onRestart} // À remplacer plus tard par ton composant Vote
+              onClick={onGoToVote}
               className="flex w-full items-center justify-center gap-3 rounded-full bg-[#C81E1E] py-5 text-xl font-bold tracking-tight text-white shadow-[0_15px_30px_-10px_rgba(200,30,30,0.6)] hover:bg-[#A01616] transition-colors"
             >
               <Gavel size={24} />
