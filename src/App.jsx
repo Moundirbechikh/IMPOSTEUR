@@ -5,26 +5,30 @@ import VoteScreen from "./components/Votescreen";
 import "./index.css";
 
 function App() {
-  // Stocke la configuration de la partie (joueurs, thème, imposteurs, etc.)
+  // Config choisie dans le setup (joueurs, thème, imposteurs, etc.)
   const [gameConfig, setGameConfig] = useState(null);
-  
-  // Gère l'écran actif : "setup" | "game" | "vote"
+
+  // Données de la manche en cours : ordre de passage tiré au sort
+  // + rôles réels de chacun, calculés une seule fois par GameScreen
+  // puis transmis tels quels au vote (jamais recalculés ailleurs)
+  const [roundData, setRoundData] = useState(null);
+
+  // Écran actif : "setup" | "game" | "vote"
   const [currentScreen, setCurrentScreen] = useState("setup");
 
-  // Démarrage de la partie depuis le setup
   const handleStartGame = (config) => {
     setGameConfig(config);
     setCurrentScreen("game");
   };
 
-  // Passage du jeu au vote
-  const handleGoToVote = () => {
+  const handleGoToVote = (data) => {
+    setRoundData(data);
     setCurrentScreen("vote");
   };
 
-  // Réinitialisation complète pour retour au menu
   const handleRestart = () => {
     setGameConfig(null);
+    setRoundData(null);
     setCurrentScreen("setup");
   };
 
@@ -35,17 +39,11 @@ function App() {
       )}
 
       {currentScreen === "game" && (
-        <GameScreen 
-          config={gameConfig} 
-          onGoToVote={handleGoToVote} 
-        />
+        <GameScreen config={gameConfig} onGoToVote={handleGoToVote} />
       )}
 
       {currentScreen === "vote" && (
-        <VoteScreen 
-          config={gameConfig} 
-          onRestart={handleRestart} 
-        />
+        <VoteScreen roundData={roundData} onRestart={handleRestart} />
       )}
     </div>
   );

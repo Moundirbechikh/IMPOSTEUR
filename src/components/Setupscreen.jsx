@@ -27,8 +27,24 @@ export const THEMES = [
 const AVATAR_COLORS = ["#C81E1E", "#F5F0E6", "#8A8578", "#C81E1E"];
 
 /* ============================================================
-   LOGO
+   LOGO — bloc identique copié tel quel dans SetupScreen,
+   GameScreen et VoteScreen : même position, même taille.
+   (Le logo géant du Welcome reste un moment à part, l'écran
+   d'intro, volontairement différent.)
 ============================================================ */
+function CornerLogo() {
+  return (
+    <div className="absolute left-6 top-6 z-20 text-[#F5F0E6]">
+      <span className="inline-flex items-center gap-[2px] text-2xl font-bold tracking-tighter">
+        <Search className="shrink-0" strokeWidth={3} size="0.85em" />
+        mp
+        <Smile className="shrink-0 text-[#C81E1E]" strokeWidth={2.5} size="0.9em" />
+        steur!?
+      </span>
+    </div>
+  );
+}
+
 function LogoMark({ size = "text-3xl", className = "" }) {
   return (
     <span className={`inline-flex items-center gap-[2px] font-bold tracking-tighter ${size} ${className}`}>
@@ -119,7 +135,7 @@ export default function ImposteurOnboarding({ onStart }) {
 }
 
 /* ============================================================
-   ÉCRAN 1 — WELCOME
+   ÉCRAN 1 — WELCOME (moment à part, logo héros géant)
 ============================================================ */
 function WelcomeScreen({ onNext }) {
   return (
@@ -179,7 +195,7 @@ function WelcomeScreen({ onNext }) {
 }
 
 /* ============================================================
-   ÉCRAN 2 — SETUP
+   ÉCRAN 2 — SETUP (logo en coin, identique à Game/Vote)
 ============================================================ */
 function SetupScreen({ onStart }) {
   const [players, setPlayers] = useState(["Nadia", "Karim", "Yasmine", "Sofiane"]);
@@ -205,30 +221,24 @@ function SetupScreen({ onStart }) {
       className="relative mx-auto flex h-full w-full max-w-md flex-col px-6 pt-6 sm:max-w-lg"
     >
       <Crack className="right-0 top-0" w={110} h={150} flip />
+      <CornerLogo />
 
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1, duration: 0.35 }}
-        className="relative z-10 shrink-0 mb-1 flex items-center justify-between"
-      >
-        <LogoMark size="text-xl" />
-        <span className="rounded-full border border-[#C81E1E]/30 bg-[#C81E1E]/10 px-3 py-1 text-xs font-bold tracking-tight text-[#C81E1E]">
-          Manche 1
-        </span>
-      </motion.div>
+      {/* badge manche, en miroir du logo, même hauteur */}
+      <span className="absolute right-6 top-6 z-20 rounded-full border border-[#C81E1E]/30 bg-[#C81E1E]/10 px-3 py-1 text-xs font-bold tracking-tight text-[#C81E1E]">
+        Manche 1
+      </span>
 
       <motion.h2
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15, duration: 0.35 }}
-        className="relative z-10 shrink-0 mb-4 text-2xl font-bold leading-tight tracking-tighter text-[#F5F0E6]/90 sm:text-3xl"
+        className="relative z-10 shrink-0 mb-1 mt-12 text-2xl font-bold leading-tight tracking-tighter text-[#F5F0E6]/90 sm:text-3xl"
       >
-        Prépare ta partie
+    
       </motion.h2>
 
       <div className="relative z-10 min-h-0 flex-1 overflow-y-auto pr-1 pb-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        
+
         {/* players */}
         <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-tight text-[#F5F0E6]/40">
           <Users size={13} /> Joueurs · {players.length}
