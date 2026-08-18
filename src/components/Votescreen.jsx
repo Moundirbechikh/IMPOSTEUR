@@ -10,10 +10,14 @@ import {
   RotateCcw,
   ArrowRight,
   Vote,
+  Scale,
+  X,
+  List,
+  ChevronLeft
 } from "lucide-react";
 
 /* ============================================================
-   LOGO — bloc identique à SetupScreen et GameScreen
+   LOGO
 ============================================================ */
 function CornerLogo() {
   return (
@@ -29,9 +33,7 @@ function CornerLogo() {
 }
 
 /* ============================================================
-   PARTICULES — petite explosion de points au verdict, pour
-   rester dans le thème (rouge/crème) sans sortir une lib de
-   confettis externe
+   PARTICULES
 ============================================================ */
 function Burst({ color = "#C81E1E", count = 14 }) {
   const particles = useMemo(
@@ -66,18 +68,14 @@ function Burst({ color = "#C81E1E", count = 14 }) {
 }
 
 /* ============================================================
-   ÉCRAN 4 — LE VOTE, TOUR PAR TOUR
+   ÉCRAN 4 — LE VOTE & VERDICT
 ============================================================ */
 export default function VoteScreen({ roundData, onRestart }) {
-  // roundData vient de GameScreen : { roles, secretWord, themeLabel }
-  // roles = l'ordre de passage tiré au sort en début de manche,
-  // avec le rôle réel de chacun. On réutilise EXACTEMENT cet
-  // ordre pour le tour de vote, et ces MÊMES rôles pour le verdict
-  // (aucune re-génération aléatoire ici).
   const turnOrder = roundData.roles;
 
   const [voterIndex, setVoterIndex] = useState(0);
   const [phase, setPhase] = useState("pass"); // "pass" | "select" | "tally" | "result"
+  const [showDetails, setShowDetails] = useState(false); // NOUVEAU: Gère l'affichage de l'écran des détails
   const [votes, setVotes] = useState({});
   const [selectedSuspect, setSelectedSuspect] = useState(null);
 
@@ -97,6 +95,7 @@ export default function VoteScreen({ roundData, onRestart }) {
     }
   };
 
+  // Calcul des résultats
   const tally = useMemo(() => {
     const counts = {};
     turnOrder.forEach((p) => (counts[p.name] = 0));
@@ -112,9 +111,13 @@ export default function VoteScreen({ roundData, onRestart }) {
       .sort((a, b) => b.count - a.count);
   }, [votes, turnOrder]);
 
-  const maxVotes = tally[0]?.count || 1;
-  const accused = tally[0];
-  const crewWins = accused?.isImposter;
+  const maxVotes = tally[0]?.count || 0;
+  // Détection des ex æquo
+  const topSuspects = tally.filter((t) => t.count === maxVotes && maxVotes > 0);
+  const isTie = topSuspects.length > 1;
+
+  const accused = !isTie ? tally[0] : null;
+  const crewWins = accused ? accused.isImposter : false;
 
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center px-6 pb-12 pt-20">
@@ -122,7 +125,7 @@ export default function VoteScreen({ roundData, onRestart }) {
 
       <AnimatePresence mode="wait">
         {/* =========================================================
-            PHASE "pass" — on passe le téléphone au votant suivant
+            PHASE "pass" — passage de téléphone
         ========================================================= */}
         {phase === "pass" && (
           <motion.div
@@ -167,7 +170,7 @@ export default function VoteScreen({ roundData, onRestart }) {
         )}
 
         {/* =========================================================
-            PHASE "select" — le votant choisit son suspect
+            PHASE "select" — choix du suspect
         ========================================================= */}
         {phase === "select" && (
           <motion.div
@@ -246,7 +249,7 @@ export default function VoteScreen({ roundData, onRestart }) {
         )}
 
         {/* =========================================================
-            PHASE "tally" — dépouillement animé
+            PHASE "tally" — dépouillement
         ========================================================= */}
         {phase === "tally" && (
           <motion.div
@@ -282,7 +285,7 @@ export default function VoteScreen({ roundData, onRestart }) {
                     <motion.div
                       className="h-full rounded-full bg-[#C81E1E]"
                       initial={{ width: 0 }}
-                      animate={{ width: `${(t.count / maxVotes) * 100}%` }}
+                      animate={{ width: `${maxVotes > 0 ? (t.count / maxVotes) * 100 : 0}%` }}
                       transition={{ delay: i * 0.12 + 0.15, duration: 0.6, ease: "easeOut" }}
                     />
                   </div>
@@ -305,83 +308,190 @@ export default function VoteScreen({ roundData, onRestart }) {
         )}
 
         {/* =========================================================
-            PHASE "result" — verdict dramatique
+            PHASE "result" — verdict dramatique scindé en deux vues
         ========================================================= */}
-        {phase === "result" && (
+        {phase === "result" && !showDetails && (
           <motion.div
-            key="result"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            key="result-main"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
             className="relative flex w-full max-w-sm flex-col items-center text-center"
           >
-            <div className="relative mb-6 flex h-28 w-28 items-center justify-center rounded-3xl bg-[#0a0a0a] border-2 border-[#1a1a1a] shadow-2xl">
+            {/* BOÎTE D'ICÔNE COLORÉE DYNAMIQUE */}
+            <div
+              className={`relative mb-6 flex h-28 w-28 items-center justify-center rounded-3xl border-2 shadow-2xl transition-all ${
+                isTie
+                  ? "border-[#EA580C]/40 bg-[#1f0d03] text-[#EA580C] shadow-[0_0_30px_rgba(234,88,12,0.25)]"
+                  : crewWins
+                  ? "border-[#C81E1E]/40 bg-[#1a0505] text-[#C81E1E] shadow-[0_0_30px_rgba(200,30,30,0.3)]"
+                  : "border-[#4B5563]/40 bg-[#111827] text-[#9CA3AF] shadow-[0_0_20px_rgba(107,114,128,0.15)]"
+              }`}
+            >
               <motion.div
                 initial={{ rotateY: 90, opacity: 0 }}
                 animate={{ rotateY: 0, opacity: 1 }}
                 transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
               >
-                {accused?.isImposter ? (
-                  <VenetianMask size={56} className="text-[#C81E1E] drop-shadow-[0_0_20px_rgba(200,30,30,0.7)]" />
+                {isTie ? (
+                  <Scale size={56} />
+                ) : crewWins ? (
+                  <VenetianMask size={56} className="drop-shadow-[0_0_20px_rgba(200,30,30,0.7)]" />
                 ) : (
-                  <ShieldCheck size={56} className="text-[#F5F0E6]/60" />
+                  <ShieldCheck size={56} />
                 )}
               </motion.div>
               {crewWins && <Burst color="#C81E1E" />}
+              {isTie && <Burst color="#EA580C" />}
             </div>
 
             <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-[#F5F0E6]/40 mb-2">
               Verdict de la partie
             </h3>
+
+            {/* TITRE DU VERDICT */}
             <h2 className="text-3xl font-black tracking-tighter text-[#F5F0E6] mb-1">
-              {accused?.name} est démasqué(e)
+              {isTie
+                ? "Égalité parfaite !"
+                : crewWins
+                ? `${accused?.name} est démasqué(e) !`
+                : `${accused?.name} est éliminé(e) !`}
             </h2>
-            <p className="mb-4 text-xs font-bold uppercase tracking-widest text-[#F5F0E6]/30">
-              {accused?.count} vote{accused?.count !== 1 ? "s" : ""} sur {turnOrder.length}
+
+            <p className="mb-6 text-xs font-bold uppercase tracking-widest text-[#F5F0E6]/30">
+              {isTie
+                ? `${topSuspects.map((s) => s.name).join(" & ")} (${maxVotes} vote${maxVotes > 1 ? "s" : ""})`
+                : `${accused?.count} vote${accused?.count !== 1 ? "s" : ""} sur ${turnOrder.length}`}
             </p>
 
+            {/* MESSAGE ET COULEURS DU BANNER */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className={`mb-6 w-full p-5 rounded-2xl border-2 ${
-                crewWins
-                  ? "border-[#C81E1E]/40 bg-[#1a0505] shadow-[0_0_30px_rgba(200,30,30,0.15)]"
-                  : "border-[#F5F0E6]/10 bg-[#141414]"
+              className={`mb-8 w-full p-5 rounded-2xl border-2 ${
+                isTie
+                  ? "border-[#EA580C]/40 bg-[#1a0c04]"
+                  : crewWins
+                  ? "border-[#C81E1E]/40 bg-[#1a0505]"
+                  : "border-[#4B5563]/30 bg-[#141414]"
               }`}
             >
               <p className="text-base font-bold tracking-tight leading-relaxed">
-                {crewWins ? (
+                {isTie ? (
+                  <span className="text-[#EA580C]">
+                    Match nul ! Aucun joueur n'a été désigné à la majorité.<br />
+                    L'imposteur en profite pour s'échapper !
+                  </span>
+                ) : crewWins ? (
                   <span className="text-[#C81E1E]">
-                    C'était bien l'imposteur !<br />Les innocents gagnent la manche.
+                    Bien joué ! C'était bien l'imposteur.<br />
+                    Les innocents remportent la victoire !
                   </span>
                 ) : (
-                  <span className="text-[#F5F0E6]/80">
-                    Raté… {accused?.name} n'était pas l'imposteur.<br />
-                    L'imposteur s'échappe et remporte la manche.
+                  <span className="text-[#9CA3AF]">
+                    Oups... {accused?.name} était un innocent !<br />
+                    L'imposteur a réussi à vous tromper.
                   </span>
                 )}
               </p>
             </motion.div>
 
-            {/* rappel discret de qui était réellement l'imposteur */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="mb-10 text-xs font-bold tracking-tight text-[#F5F0E6]/30"
+            {/* NOUVEAU BOUTON : VOIR LES DÉTAILS */}
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              onClick={() => setShowDetails(true)}
+              className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-[#F5F0E6]/10 bg-[#0a0a0a] py-4 text-sm font-bold tracking-tight text-[#F5F0E6]/70 hover:bg-[#141414] hover:text-[#F5F0E6] transition-colors"
             >
-              Imposteur{turnOrder.filter((p) => p.isImposter).length > 1 ? "s" : ""} :{" "}
-              {turnOrder.filter((p) => p.isImposter).map((p) => p.name).join(", ")}
-            </motion.p>
+              <List size={18} />
+              Voir le détail des votes
+            </motion.button>
 
+            {/* BOUTON REJOUER */}
             <motion.button
               whileTap={{ scale: 0.94 }}
               whileHover={{ scale: 1.02 }}
               onClick={onRestart}
-              className="flex w-full items-center justify-center gap-3 rounded-full bg-[#F5F0E6] py-5 text-xl font-bold tracking-tight text-black shadow-[0_15px_30px_-10px_rgba(245,240,230,0.3)] hover:bg-white transition-colors"
+              className="flex w-full items-center justify-center gap-3 rounded-full bg-[#F5F0E6] py-4 text-lg font-bold tracking-tight text-black shadow-[0_15px_30px_-10px_rgba(245,240,230,0.3)] hover:bg-white transition-colors"
             >
               <RotateCcw size={20} />
-              Rejouer
+              Rejouer une partie
+            </motion.button>
+          </motion.div>
+        )}
+
+        {/* =========================================================
+            PHASE "result" — Vue des DÉTAILS
+        ========================================================= */}
+        {phase === "result" && showDetails && (
+          <motion.div
+            key="result-details"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 30 }}
+            className="flex w-full max-w-sm flex-col items-center"
+          >
+            <div className="mb-6 flex flex-col items-center text-center w-full">
+              <h2 className="text-2xl font-black text-[#F5F0E6] tracking-tight">
+                Détail des votes
+              </h2>
+              <p className="mt-2 text-sm font-medium leading-snug text-[#F5F0E6]/60">
+                Qui a voté contre qui ?
+              </p>
+            </div>
+
+            {/* DÉTAIL DES VOTES DE CHAQUE JOUEUR */}
+            <div className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-4 mb-6">
+              <div className="space-y-3">
+                {turnOrder.map((p) => {
+                  const votedFor = votes[p.name];
+                  const votedTarget = turnOrder.find((item) => item.name === votedFor);
+                  const votedCorrectly = votedTarget?.isImposter;
+
+                  return (
+                    <div
+                      key={p.name}
+                      className="flex items-center justify-between text-sm font-medium border-b border-[#1a1a1a] pb-3 last:border-none last:pb-0"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-[#F5F0E6]">{p.name}</span>
+                        <ArrowRight size={14} className="text-[#F5F0E6]/20" />
+                        <span className="font-semibold text-[#F5F0E6]/80">{votedFor}</span>
+                      </div>
+
+                      {votedCorrectly ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <Check size={12} strokeWidth={3} /> Vrai
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-gray-500/10 text-gray-400 border border-gray-500/20">
+                          <X size={12} strokeWidth={3} /> Faux
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* RECAPITULATIF DISCRET DES IMPOSTEURS */}
+            <div className="mb-8 w-full p-4 rounded-xl border border-[#C81E1E]/20 bg-[#C81E1E]/5 text-center">
+              <p className="text-xs font-bold tracking-tight text-[#F5F0E6]/60">
+                Vrai{turnOrder.filter((p) => p.isImposter).length > 1 ? "x" : ""} imposteur{turnOrder.filter((p) => p.isImposter).length > 1 ? "s" : ""} :{" "}
+                <span className="text-[#C81E1E] text-sm uppercase tracking-wider">
+                  {turnOrder.filter((p) => p.isImposter).map((p) => p.name).join(", ")}
+                </span>
+              </p>
+            </div>
+
+            {/* BOUTON RETOUR AU VERDICT */}
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              onClick={() => setShowDetails(false)}
+              className="mb-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#141414] border border-[#F5F0E6]/10 py-4 text-sm font-bold tracking-tight text-[#F5F0E6]/90 hover:bg-[#1a1a1a] transition-colors"
+            >
+              <ChevronLeft size={18} />
+              Retour au verdict
             </motion.button>
           </motion.div>
         )}
