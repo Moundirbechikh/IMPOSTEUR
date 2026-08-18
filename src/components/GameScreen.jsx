@@ -18,10 +18,13 @@ import { THEMES } from "./Setupscreen";
    DICTIONNAIRE DE MOTS
 ============================================================ */
 const WORDS = {
-  cinema: ["Titanic", "Spider-Man", "Jurassic Park", "Inception", "Avatar"],
-  animaux: ["Panda", "Éléphant", "Requin", "Crocodile", "Kangourou"],
-  metiers: ["Pompier", "Dentiste", "Astronaute", "Boulanger", "Cuisinier"],
-  bouffe: ["Pizza", "Sushi", "Tacos", "Raclette", "Couscous"],
+  cinema: ["Titanic", "Avatar", "Star Wars", "Harry Potter", "Jurassic Park", "Le Parrain", "Matrix", "Avengers", "Le Seigneur des Anneaux", "Inception", "Forrest Gump", "Le Roi Lion", "Gladiator", "Terminator", "Spider-Man", "Batman", "Retour vers le futur", "E.T.", "Indiana Jones", "Pulp Fiction", "Interstellar", "Joker", "Rocky", "Les Dents de la mer", "Pirates des Caraïbes", "Toy Story", "Shrek", "Fight Club", "Les Évadés", "La Ligne Verte"],
+  
+  animaux: ["Fennec", "Dromadaire", "Chat", "Chien", "Lion", "Tigre", "Éléphant", "Girafe", "Zèbre", "Cheval", "Vache", "Mouton", "Loup", "Ours", "Dauphin", "Requin", "Baleine", "Panda", "Pingouin", "Kangourou", "Crocodile", "Serpent", "Tortue", "Lapin", "Singe", "Renard", "Aigle", "Scorpion", "Sanglier", "Hippopotame"],
+  
+  metiers: ["Boulanger", "Coiffeur", "Tailleur", "Maçon", "Chauffeur de taxi", "Épicier", "Enseignant", "Médecin", "Ingénieur", "Agriculteur", "Pêcheur", "Artisan", "Berger", "Fonctionnaire", "Notaire", "Avocat", "Vendeur", "Plombier", "Électricien", "Boucher", "Pharmacien", "Mécanicien", "Menuisier", "Infirmier", "Policier", "Pompier", "Commerçant", "Peintre", "Cuisinier", "Livreur"],
+  
+  bouffe: ["Pizza", "Hamburger", "Sushi", "Tacos", "Pâtes", "Frites", "Salade", "Sandwich", "Glace", "Crêpe", "Omelette", "Fromage", "Riz", "Poulet rôti", "Steak", "Soupe", "Couscous", "Chorba", "Bourek", "Chakhchoukha", "Rechta", "Mhadjeb", "Karantika", "Kalb El Louz", "Makroud", "Tajine", "Merguez", "Hmiss", "Zlabia", "Lasagnes"]
 };
 
 /* ============================================================
@@ -60,17 +63,22 @@ function CornerLogo() {
 export default function GameScreen({ config, onGoToVote }) {
   const { players, themeId, imposters, imposterSeesTheme } = config;
 
-  // Un seul mélange, qui sert à la fois d'ordre de passage ET de
-  // tirage des imposteurs — recalculé uniquement au montage du
-  // composant, donc à chaque nouvelle manche.
+  // Un seul mélange pour l'ordre, et un autre pour les rôles
+  // recalculé uniquement au montage du composant
   const gameData = useMemo(() => {
+    // 1. On définit l'ordre de passage (qui joue en 1er, 2ème, etc.)
     const turnOrder = shuffleArray(players);
-    const imposterNames = turnOrder.slice(0, imposters);
+    
+    // 2. On tire les imposteurs au hasard de façon INDÉPENDANTE
+    // On remélange la liste initiale, et on prend les X premiers
+    const shuffledForRoles = shuffleArray(players);
+    const imposterNames = shuffledForRoles.slice(0, imposters);
 
     const themeWords = WORDS[themeId] || ["Mystère"];
     const secretWord = themeWords[Math.floor(Math.random() * themeWords.length)];
     const currentTheme = THEMES.find((t) => t.id === themeId);
 
+    // 3. On associe les rôles à l'ordre de passage
     const roles = turnOrder.map((name) => ({
       name,
       isImposter: imposterNames.includes(name),

@@ -198,7 +198,7 @@ function WelcomeScreen({ onNext }) {
    ÉCRAN 2 — SETUP (logo en coin, identique à Game/Vote)
 ============================================================ */
 function SetupScreen({ onStart }) {
-  const [players, setPlayers] = useState(["Nadia", "Karim", "Yasmine", "Sofiane"]);
+  const [players, setPlayers] = useState(["Moundir", "Nadir", "Amine", "Sami"]);
   const [newName, setNewName] = useState("");
   const [themeId, setThemeId] = useState("cinema");
   const [imposters, setImposters] = useState(1);
