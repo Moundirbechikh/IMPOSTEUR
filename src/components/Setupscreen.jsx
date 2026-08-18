@@ -16,7 +16,8 @@ import {
   EyeOff,
 } from "lucide-react";
 
-const THEMES = [
+// On l'exporte pour que GameScreen puisse l'utiliser !
+export const THEMES = [
   { id: "cinema", label: "Cinéma", icon: Film },
   { id: "animaux", label: "Animaux", icon: PawPrint },
   { id: "metiers", label: "Métiers", icon: Briefcase },
@@ -26,7 +27,7 @@ const THEMES = [
 const AVATAR_COLORS = ["#C81E1E", "#F5F0E6", "#8A8578", "#C81E1E"];
 
 /* ============================================================
-   LOGO — mot-symbole : loupe + "mp" + smiley (le O) + "steur!?"
+   LOGO
 ============================================================ */
 function LogoMark({ size = "text-3xl", className = "" }) {
   return (
@@ -40,8 +41,7 @@ function LogoMark({ size = "text-3xl", className = "" }) {
 }
 
 /* ============================================================
-   FISSURES — traits fins façon statue craquelée, discrets,
-   un ou deux par écran, jamais plus de ~30% de hauteur
+   FISSURES
 ============================================================ */
 function Crack({ className = "", w = 140, h = 190, flip = false }) {
   const path = useMemo(() => {
@@ -79,7 +79,7 @@ function Crack({ className = "", w = 140, h = 190, flip = false }) {
 }
 
 /* ============================================================
-   TOGGLE — switch on/off, style cohérent avec le reste
+   TOGGLE
 ============================================================ */
 function Toggle({ checked, onChange }) {
   return (
@@ -100,13 +100,13 @@ function Toggle({ checked, onChange }) {
 }
 
 /* ============================================================
-   WRAPPER
+   WRAPPER ONBOARDING
 ============================================================ */
 export default function ImposteurOnboarding({ onStart }) {
   const [step, setStep] = useState("welcome");
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black font-chewy text-[#F5F0E6]">
+    <div className="relative h-full w-full">
       <AnimatePresence mode="wait">
         {step === "welcome" ? (
           <WelcomeScreen key="welcome" onNext={() => setStep("setup")} />
@@ -128,7 +128,6 @@ function WelcomeScreen({ onNext }) {
       transition={{ duration: 0.45, ease: "easeInOut" }}
       className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-8 text-center"
     >
-      {/* 2 fissures seulement, coins opposés, contenues */}
       <Crack className="left-0 top-0" w={130} h={180} />
       <Crack className="bottom-0 right-0" w={130} h={180} flip />
 
@@ -180,7 +179,7 @@ function WelcomeScreen({ onNext }) {
 }
 
 /* ============================================================
-   ÉCRAN 2 — SETUP (même palette noire que le welcome)
+   ÉCRAN 2 — SETUP
 ============================================================ */
 function SetupScreen({ onStart }) {
   const [players, setPlayers] = useState(["Nadia", "Karim", "Yasmine", "Sofiane"]);
@@ -207,7 +206,6 @@ function SetupScreen({ onStart }) {
     >
       <Crack className="right-0 top-0" w={110} h={150} flip />
 
-      {/* ---- header : toujours visible, ne bouge jamais ---- */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -229,7 +227,6 @@ function SetupScreen({ onStart }) {
         Prépare ta partie
       </motion.h2>
 
-      {/* ---- zone scrollable : tout le contenu variable et le bouton vivent ici ---- */}
       <div className="relative z-10 min-h-0 flex-1 overflow-y-auto pr-1 pb-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         
         {/* players */}
@@ -347,7 +344,7 @@ function SetupScreen({ onStart }) {
           </div>
         </div>
 
-        {/* ---- CTA : Intégré dans le flux directement sous les imposteurs ---- */}
+        {/* CTA */}
         <div className="relative mt-2">
           <motion.button
             disabled={!canStart}
