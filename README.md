@@ -4,7 +4,7 @@
   <img src="./public/3.jpg" alt="Imposteur — vote" width="32%" />
 </p>
 
-<h1 align="center">🔍mp😊steur!?</h1>
+<h1 align="center"> <img src="./public/Logo.png" alt="Imposteur — préparation de partie" width="20%" /></h1>
 
 <p align="center">
   <strong>Un mot pour tous. Un silence pour celui qui bluffe.</strong><br/>
